@@ -1,0 +1,43 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\ItemPenjualan;
+use Illuminate\Database\Seeder;
+use App\Models\Penjualan;
+use Illuminate\Support\Facades\DB;
+
+class PenjualanSeeder extends Seeder 
+ {      
+    public function run(): void
+     {
+    $this->call([
+        RoleSeeder::class,
+        UserSeeder::class, 
+        ProdukSeeder::class, 
+    ]);
+
+    DB::transaction(function() {
+
+            Penjualan::factory()
+            ->count(50)
+            ->create()
+            ->each(function($penjualan) {
+
+            $items = ItemPenjualan::factory()
+            ->count(rand(1, 5))
+            ->make([
+                'penjualan_id' => $penjualan->id,
+            ]);
+
+            $total = $items->sum('subtotal');
+
+            $penjualan->itemPenjualan()->saveMany($items);
+
+            $penjualan->update([
+                'total_pembayaran' => $total,
+                            ]);
+            });
+        });
+    }
+}

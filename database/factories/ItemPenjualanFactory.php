@@ -1,0 +1,34 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\ItemPenjualan;
+USE App\Models\Produk;
+
+/**
+ * @extends \Illuminate\Databse\Elequent\Factories\Factory<\App\Models\ItemPenjualan>
+ */
+class ItemPenjualanFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+       protected $model = ItemPenjualan::class;
+
+    public function definition(): array
+    {
+     
+    $produk = Produk::inRandomOrder()->first();
+    $qty = $this->faker->numberBetween(1, 10);
+
+    return [
+            'Produk_id' => $produk->id,
+            'kuantitas' => $qty,
+            'harga_satuan' => $produk->harga_jual,
+            'subtotal' => $produk->harga_jual * $qty,
+                     ];
+    }
+}
