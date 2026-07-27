@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class produk extends Model

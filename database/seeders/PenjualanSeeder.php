@@ -11,11 +11,6 @@ class PenjualanSeeder extends Seeder
  {      
     public function run(): void
      {
-    $this->call([
-        RoleSeeder::class,
-        UserSeeder::class, 
-        ProdukSeeder::class, 
-    ]);
 
     DB::transaction(function() {
 
