@@ -29,6 +29,11 @@
          <li class="nav-item">
     <a class="nav-link {{ Request::is('penjualan') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
            </li>
+        
+           <li class="nav-item">
+    <a class="nav-link {{ Request::is('jenis') ? 'active' : '' }}" href="{{ route('jenis.index') }}">Jenis</a>
+           </li>
+           
       </ul>
 
       <form class="ms-auto" action="{{ route('logout') }}" method="POST">

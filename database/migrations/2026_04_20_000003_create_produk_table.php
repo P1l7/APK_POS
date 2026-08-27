@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('produk', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('jenis_id')->constrained('jenis')->restrictOnDelete();
             $table->string('foto');
             $table->string('name');
             $table->integer('harga_beli');
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produk_table');
+        Schema::dropIfExists('produk');
     }
 };

@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('produk', function (Blueprint $table) {
-            //
-        });
+         Schema::create('jenis', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users','id')->restrictOnDelete();
+            $table->string('nama_jenis');
+            $table->timestamps(); 
+            });
     }
 
     /**
      * Reverse the migrations.
      */
+    
     public function down(): void
     {
-        Schema::table('produk', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('jenis');
     }
 };

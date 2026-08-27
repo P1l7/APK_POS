@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Produk;
+use App\Models\Jenis;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
 
@@ -22,6 +23,7 @@ class ProdukFactory extends Factory
         return  
             [
             'user_id' => User::where('role_id', 1)->inRandomOrder()->value('id'),
+            'jenis_id' => Jenis::inRandomOrder()->value('id'),
             'foto' => 'Produk/' . $this->faker->uuid() . '.jpg',
             'name' => $this->faker->words(3, true),
             'harga_beli' => $hargabeli,

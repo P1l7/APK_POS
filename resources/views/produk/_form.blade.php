@@ -42,6 +42,28 @@
 
 </div>
 
+                   {{-- Jenis --}}
+<div class="mb-3">
+        <label>Jenis</label>
+   <select
+       name="jenis_id"
+       class="form-control @error('jenis_id') is-invalid @enderror"
+   >
+        <option value="">-- Pilih Jenis --</option>
+        @foreach ($jenisList as $j)
+           <option
+                value="{{ $j->id }}"
+                {{ (string) old('jenis_id', $produk->jenis_id ?? '') === (string) $j->id ? 'selected' : '' }}
+           >
+                {{ $j->nama_jenis }}
+            </option>
+        @endforeach
+    </select>
+    @error('jenis_id')
+       <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
 {{-- Nama Produk --}}
 <div class="mb-3">
     <label>Nama Produk</label>

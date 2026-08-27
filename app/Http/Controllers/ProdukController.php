@@ -6,6 +6,7 @@ use App\Http\Requests\Produk\StoreRequest;
 use App\Http\Requests\Produk\UpdateRequest;
 use App\Http\Requests\SearchRequest;
 use App\Models\Produk;
+use App\Models\Jenis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,46 +18,53 @@ class ProdukController extends Controller
         $this->authorize('viewAny', Produk::class);
 
         $keyword = $request->input('search');
+        $jenisId = $request->input('jenis_id');
 
-        if ($keyword) {
-            $products = Produk::when($keyword, function ($query) use ($keyword) {
-                $query->where('name', 'like', '%' . $keyword . '%');
-            })
-            ->orderBy('name')
-            ->paginate(10)
-            ->withQueryString();
-        } else {
-            $products = Produk::latest()->paginate(10)->withQueryString();
-        }
+       $products = Produk::when($keyword, function ($query) use ($keyword) {
+            $query->where('name', 'like', '%' . $keyword . '%');
+        })
+        ->when($jenisId, function ($query) use ($jenisId) {
+            $query->where('jenis_id', $jenisId);
+          })
+       ->latest()
+        ->paginate(10)
+        ->withQueryString();
+        
 
-        return view('produk.index', compact('products'));
+          $jenisList = Jenis::where('user_id', Auth::id())->orderBy('nama_jenis')->get();
+
+    return view('produk.index', compact('products', 'jenisList'));
     }
 
     public function create()
-    {
-        $this->authorize('create', Produk::class);
-        return view('produk.create');
+   {
+    $this->authorize('create', Produk::class);
+    $jenisList = Jenis::where('user_id', Auth::id())->orderBy('nama_jenis')->get();
+    return view('produk.create', compact('jenisList'));
     }
 
     public function store(StoreRequest $request)
-    {
-        $this->authorize('create', Produk::class);
+{
+    $this->authorize('create', Produk::class);
 
-        $dataReq = $request->validated();
+    $dataReq = $request->validated();
 
-        $data['user_id']    = Auth::id();
-        $data['name']       = $dataReq['name'];
-        $data['harga_beli'] = $dataReq['purchase_price'];
-        $data['harga_jual'] = $dataReq['selling_price'];
-        $data['stok']       = $dataReq['stock'];
+    
+    $data['user_id']    = Auth::id();
+    $data['jenis_id']   = $dataReq['jenis_id'];
+    $data['name']       = $dataReq['name'];
+    $data['harga_beli'] = $dataReq['purchase_price'];
+    $data['harga_jual'] = $dataReq['selling_price'];
+    $data['stok']       = $dataReq['stock'];
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('products', 'public');
-        }
+    if ($request->hasFile('foto')) {
+        $data['foto'] = $request->file('foto')->store('products', 'public');
+    }
 
-        Produk::create($data);
+    Produk::create($data);
 
-        return redirect()->route('produk.index')->with('success', 'Product created successfully.');
+    return redirect()->route('produk.index')->with('success', 'Product created successfully.');
+
     }
 
     public function show(string $id)
@@ -65,35 +73,42 @@ class ProdukController extends Controller
     }
 
     public function edit(Produk $produk)
-    {
-        $this->authorize('update', $produk);
-        return view('produk.edit', compact('produk'));
-    }
+{
+    $jenisList = Jenis::orderBy('nama_jenis', 'asc')->get();
+
+    return view('produk.edit', compact('produk', 'jenisList'));
+}
 
     public function update(UpdateRequest $request, Produk $produk)
-    {
-        $this->authorize('update', $produk);
-        $dataReq = $request->validated();
+{
+    $this->authorize('update', $produk);
 
-        $data = [
-            'user_id'    => Auth::id(),
-            'name'       => $dataReq['name'],
-            'harga_beli' => $dataReq['purchase_price'],
-            'harga_jual' => $dataReq['selling_price'],
-            'stok'       => $dataReq['stock'],
-        ];
+    $dataReq = $request->validated();
 
-        if ($request->hasFile('foto')) {
-            if ($produk->foto && Storage::disk('public')->exists($produk->foto)) {
-                Storage::disk('public')->delete($produk->foto);
-            }
-            $data['foto'] = $request->file('foto')->store('products', 'public');
+    $data = [
+        'user_id'    => Auth::id(),
+        'jenis_id'   => $dataReq['jenis_id'],
+        'name'       => $dataReq['name'],
+        'harga_beli' => $dataReq['purchase_price'],
+        'harga_jual' => $dataReq['selling_price'],
+        'stok'       => $dataReq['stock'],
+    ];
+
+    if ($request->hasFile('foto')) {
+
+        if ($produk->foto && Storage::disk('public')->exists($produk->foto)) {
+            Storage::disk('public')->delete($produk->foto);
         }
 
-        $produk->update($data);
-
-        return redirect()->route('produk.index')->with('success', 'Product updated successfully.');
+        $data['foto'] = $request->file('foto')->store('products', 'public');
     }
+
+    $produk->update($data);
+
+    return redirect()
+        ->route('produk.index')
+        ->with('success', 'Product updated successfully.');
+}
 
     public function destroy(Produk $produk)
     {
